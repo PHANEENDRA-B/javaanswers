@@ -1,0 +1,415 @@
+Today we will explore
+Aggregate functions
+GROUP BY and HAVING
+Analytic function**
+Joins in SQL
+Subquery examples
+
+------------------------------
+
+Recap
+1. Assume a table PERSON has only one column NAME.
+You write
+ALTER TABLE person
+DROP COLUMN name;
+Predict the result.
+The query will fail as the table must contain at least one column to exist.
+
+2. Assume the above table has three columns (id, fname, lname)
+I want to update the record with id=1 and set the fname='Suresh' and lname='Kumar'
+Tell me the correct syntax of update query.
+update person
+set fname='suresh',lname='kumar'
+where id=1;
+
+3. Assume the same table with column id, fname,lname, email, phone.
+The phone column is allowing NULL values.
+How you will find the id and fname of the records who have not provided
+phone number or have given invalid phone no 
+a) not of 10 digits
+b) does not start with anything between 6 and 9
+
+insert into person 
+values('Raman',null),('Raju','9867098765'),('Roshni','7689098765'),('Ravi','5456789690'),
+('Ryan','987654')
+
+select name,phone from person
+where phone is null or length(phone)<>10 or phone not like '6%' 
+and phone not like '7%' and phone not like '8%' and phone not like '9%';
+
+select name,phone from person
+where phone is null or length(phone)<>10 or substring(phone,1,1) not in('6','7','8','9');
+
+Aggregate functions : sum, max, min, count and average
+Out of these, max,min and count do work with all data types
+
+select max(ename), min(ename) from emp;
+-- WARD for max(ename)
+-- ADAMS for min(ename)
+
+select max(hiredate), min(hiredate) from emp;
+-- 2026-03-25 doj of the most recent recruit max(hiredate)
+-- you get the doj of the most exp emp using min(hiredate)
+
+We will perform any aggregate operation, we get one result for the entire group.
+Unlike scalar function where we get one result for each computed row.
+
+We may plan to group them based on one or more criteria.
+
+WAQ to find the head count for each dept.
+-- a column in group by clause may not be present in SELECT query
+select count(empno) from emp
+group by deptno;
+
+-- a column on which no aggregate function has been applied if present
+-- along with a column with aggregate function applied
+-- it must be placed with GROUP BY clause
+select deptno, count(empno) as headcount
+from emp
+group by deptno;
+
+When to apply HAVING clause? 
+We use HAVING clause to filter the grouped data.
+
+Can I write HAVING clause without GROUP BY clause?
+ No because the fetched result will not be correct.
+
+Does HAVING clause support column alias? Yes, if supported by the DBMS
+In MySQL it does support
+select deptno, count(empno) as headcount
+from emp
+group by deptno
+having headcount >=3;
+
+In the same query, can we use WHERE clause and HAVING clause both?
+select deptno, count(empno) as headcount
+from emp
+where deptno >20
+group by deptno
+having headcount >=3
+
+We can nest scalar and aggregate function together.
+
+WAQ to find the length with longest name.
+select max(length(ename)) from emp;
+
+Can we nest multiple scalar functions? yes
+select upper(trim(ename)) from emp;
+
+Class Work
+------------
+How to display the name in title case? fname=>'manoj' lname=>'agarwal'
+Manoj Agarwal
+Hint: Use functions like concat, upper, lower, substring
+
+Can we nest multiple aggregate functions?
+Generally it is not very much accepted as a query but it depends 
+on the database software we are using. 
+
+WAQ to find which dept has the highest head count.
+
+select max(count(empno)) max_head_count from emp
+where deptno is not null
+group by deptno;
+
+MySQL tells invalid use of group function
+Oracle executes the above query properly.
+
+JOINs are used to capture data from one(self join) or more tables.
+Joins are of types:
+a) left|right is an outer join
+b) inner
+c) cross join aka cartesian product
+d) self join
+e) equi|non equi join
+
+Ways to write a join 
+(default => inner join, only matching records from the concerned tables are fetched)
+
+ANSI SQL style (recommended)
+-----------------------------
+select ename, dname
+from emp join dept
+on emp.deptno=dept.deptno;
+
+Theta style (lesser readability)
+---------------------------------
+select ename, dname
+from emp , dept
+where emp.deptno=dept.deptno;
+
+Assume I also have location table (locid, lcode, address)
+which is linked to dept table based on locid column.
+
+select ename, dname, address
+from emp join dept
+on emp.deptno=dept.deptno
+join location
+on location.locid=dept.locid;
+
+If there are N tables to be joined, N-1 join conditions are to be written.
+
+How to achieve the same using theta style?
+select ename, dname
+from emp , dept, location
+where emp.deptno=dept.deptno
+and location.locid=dept.locid;
+
+Outer join is used to fetch matching records from both tables and 
+additional records from one of the tables.
+
+Using ANSI SQL style
+
+WAQ to find all departments and the employees working in them.
+
+select ename, dname
+from emp right join dept
+on emp.deptno=dept.deptno;
+
+First, we figure out which table is supposed to have more records and that table is mentioned
+on which side of the join keyword. Based on that, you decide left or right join.
+
+select ename, dname
+from dept left join emp
+on emp.deptno=dept.deptno;
+
+Can I perform outer join using theta style? YES
+If yes, then how to do it?
+
+Using + sign (in Oracle) on the side of the table presumed to have less records.
+Is not possible in MySQL
+
+select first_name, DEPARTMENT_NAME
+from hr.EMPLOYEES a , hr.DEpartments d
+where a.DEPARTMENT_ID(+)=d.department_id
+
+In theta style, full outer join is NOT SUPPORTED.
+
+The above example of inner join is also an example of equi join (we had used = sign to compare)
+We can re write the join query 
+a) using USING clause
+select ename, dname
+from dept join emp
+using (Deptno)
+- the column participating in join must have the same name and data type in both tables
+
+b) using NATURAL join
+select ename, dname
+from dept natural join emp
+Ref: https://www.geeksforgeeks.org/sql/sql-natural-join/
+
+Explain with an example when to use self join.
+
+A self join happens when a table is joined to itself.
+Like to fetch hierarchical data (emp's mgr is another emp)
+Key point: table alias is MUST
+
+select me.ename worker , b.ename manager
+from emp me join emp b
+on me.mgr=b.empno
+
+Another example of self join
+------------------------------
+Assume there is a airline table in the database
+columns like flight_id, source, dest, company
+
+WAQ to find which flights are between same source and destination.
+
+select a1.flight_id
+from airline a1 join airline a2
+on a1.source=a2.source
+and a1.dest=a2.dest
+and a1.flight_id <> a2.flight_id;
+
+We are now going to explore cross join aka cartesian product.
+
+If there are two tables one having M rows and the other having N rows, cross join will fetch
+M*N rows. All possible combinations of rows shall be fetched.
+
+Analytic function is a simple way of writing function using OVER and PARTITION BY clauses.
+
+select ename,sal,deptno,rank() over(partition by deptno order by sal desc) as rank_emp
+from emp
+where deptno is not null;
+
+# ename	sal	deptno	rank_emp
+KING	5000.00	10	1
+CLARK	2450.00	10	2
+MILLER	1300.00	10	3
+SCOTT	3000.00	20	1
+FORD	3000.00	20	1
+JONES	2975.00	20	3
+ADAMS	1100.00	20	4
+SMITH	800.00	20	5
+
+Unlike rank() function where gaps are introduced, we may use dense_rank() to skip such gaps.
+
+select ename,sal,deptno,dense_rank() over(partition by deptno order by sal desc) as rank_emp
+from emp
+where deptno is not null;
+
+# ename	sal	deptno	rank_emp
+KING	5000.00	10	1
+CLARK	2450.00	10	2
+MILLER	1300.00	10	3
+SCOTT	3000.00	20	1
+FORD	3000.00	20	1
+JONES	2975.00	20	2
+ADAMS	1100.00	20	3
+SMITH	800.00	20	4
+
+Several such analytic functions are available in db concepts like row_number(), rank(), 
+dense_rank() and so on
+
+WAQ to print the name, salary and deptno of the employees along with the highest salary
+given in his OWN dept.
+
+Using analytic function
+--------------------------
+select ename,sal,deptno,max(sal) over(partition by deptno) as deptno_max_sal
+from emp
+where deptno is not null;
+
+# ename	sal	deptno	deptno_max_sal
+CLARK	2450.00	10	5000.00
+KING	5000.00	10	5000.00
+MILLER	1300.00	10	5000.00
+SMITH	800.00	20	3000.00
+JONES	2975.00	20	3000.00
+SCOTT	3000.00	20	3000.00
+ADAMS	1100.00	20	3000.00
+
+Here, you are clubbing normal data with grouped data and not losing out any records.
+When group by clause we cannot display both grouped and ungrouped data together.
+The GROUP BY clause does Collapse multiple rows into a single summary row for each group.
+Which is not the case for analytic(window) functions.
+
+We now move on to discuss sub query/ nested query in ANSI SQL.
+
+A query when written within another query is a sub query
+Can be
+a) simple or non -correlated subquery :: the inner query is independent of the outer query
+b) correlated sub query :: both the queries mutually depend on each other.
+
+Can I add ORDER BY clause in the sub query?
+
+Oracle (fails to work)
+select first_name,salary,department_id
+from hr.employees e where employee_id in (
+	select employee_id from hr.employees where department_id=20 order by employee_id desc
+)
+-- order by employee_id desc;
+
+It does not make sense becoz the outer query may return rows in any order unless
+you also add ORDER BY in the outer query.
+
+MySQL (works)
+select ename,sal,deptno
+from emp
+where empno in (
+	select empno from emp
+	where deptno=20
+	order by empno desc
+);
+
+Key points
+a) If the inner query returns even a single NULL value, the outer query does not return any records.
+
+We are fetching the departments in which no employees are working currently.
+select deptno
+from dept
+where deptno not in (
+	select distinct deptno
+	from emp
+	where deptno is not null);
+
+--Explanation--
+select deptno
+from dept
+where deptno not in (unique deptnos from emp table)
+
+b) If the inner query fetches more than one result, we cannot use = or any such comparison operator.
+We need to use multiple row sub query operator like IN, ANY and ALL.
+
+select ename from emp
+where job IN (
+	select distinct job from emp
+	where hiredate like '2008%'
+);
+
+c) Can we fetch multiple columns from the sub query and use it in the outer query? Yes
+
+select ename,sal, deptno
+from emp
+where (deptno,sal) in
+	(select deptno,sal from emp
+	where empno=7521);
+
+d) How shall we write a correlated sub query? The table alias is MUST in the outer query 
+to reach out from the inner query
+
+# WAQ to display emp records earning more than the average salary of his own dept.
+select deptno,ename,sal
+from emp e
+where sal >(select avg(sal) from emp
+where e.deptno=deptno) 
+
+Writing an INLINE view (writing a sub query in the FROM clause)
+An inline view in SQL is a subquery (SELECT statement) that appears in the FROM clause of another query.
+It acts like a temporary, virtual table that exists only for the duration of the query execution.
+
+select max(head_count)
+from (
+    select count(empno) head_count
+    from emp
+   where deptno is not null
+   group by deptno
+)t;
+
+Another example of inline view (borrowed from internet!)
+SELECT name, salary
+FROM (
+    SELECT name, salary, department,
+           AVG(salary) OVER (PARTITION BY department) AS avg_salary
+    FROM employees
+) AS emp_avg
+WHERE department = 'IT'
+  AND salary > avg_salary;
+How it works:
+
+The inline view (emp_avg) calculates the average salary per department.
+The outer query filters only IT employees earning above that average.
+
+Advantages of Inline Views:
+Avoids creating temporary tables.
+Makes queries more readable and modular.
+Can be combined with aggregation, window functions, and joins.
+
+What is SQL view? How does it help?
+A view wraps a complex query which involves aggregate functions, joins and sub query.
+It does not contain any data but just the query.
+It allows us to hide the complexity and enhance the security by not exposing the 
+actual table name(s) and column name(s)
+
+Can we use a view to update the records in the base table?
+create view pview
+as
+select * from person;
+
+We can update the base table person using simple view.
+update pview
+set phone='9908761234'
+where name='Raman'
+
+We cannot update the base tables through view if the view's query has complex conditions, joins and sub queries. In such as case, if it is very much required, the solution can be done using INSTEAD OF triggers.
+
+What is the use of creating an index in SQL?
+Index allows fast retrieval of data.
+
+Any key points to remember when creating index.
+a) We should create an index only on a column which is most searched and rarely updated.
+b) We should not create an index on a column with low cardinality.
+
+When we create a PK column, a unique index is automatically created on the table.
+It is maintained by the database engine.
+

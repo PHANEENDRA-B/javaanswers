@@ -1,0 +1,497 @@
+Agenda
+-------
+Collection framework
+Stream API
+
+conn
+system
+password-1
+
+alter user hr
+identified by hr
+account unlock;
+
+The date related functions in Oracle are not exactly same as that in MySQL.
+Instead of using ifnull() to convert null to not null equivalent, use nvl() in Oracle.
+select nvl(commission_pct,0) from employees
+where department_id in (60,80);
+select nvl2(commission_pct,'yes','no') from employees;
+
+select current_date, sysdate from dual;
+
+The dual is the dummy experimental table provided access to by the owner system. We can use it for 
+our queries but cannot perform any DDL or DML operation on it.
+
+select initcap('sql course') from dual;
+
+select round(current_date,'month') from dual;
+If the date of the month <=15, we get the date 1st of the same month
+If the date of the month >15, we get the date 1st of the next month
+
+SQL> select round(current_date,'month') from dual;
+
+ROUND(CUR
+---------
+01-MAY-26
+
+SQL> select round(current_date+3,'month') from dual;
+
+ROUND(CUR
+---------
+01-JUN-26
+
+select round(current_date+65,'year') from dual;
+If the month <=6, we get the date 1st Jan of the same year
+If the month >6, we get the date 1st Jan of the next year
+
+SQL> select months_between(to_date('2026-07-14','yyyy-MM-dd'),current_date) as months_left from dual;
+
+MONTHS_LEFT
+-----------
+          2
+
+SQL> select next_day(current_date,'friday') as new_Date from dual;
+
+NEW_DATE
+---------
+15-MAY-26
+
+1. Predict the output of the code below:
+class Person{
+	String name;
+	String gender;
+
+	Person(String name, String gender){
+		this.name=name;
+		this.gender=gender;
+	}
+	Person(){
+		this.name="Shan";
+		this.gender="male";
+	}
+}
+
+class Employee extends Person{
+
+}
+
+From the class MainApp, I wrote 
+	Person p=new Employee();
+	System.out.println(p.name);//Shan
+
+
+2. Predict the output
+class Drinks{
+	String name;
+}
+class Tea extends Drinks{
+	Tea(String name){
+		super(name);
+	}
+}
+
+class Coffee extends Drinks{
+	Coffee(String name){
+		super(name);
+	}
+}
+
+Then in the class MainApp, I wrote
+	Drinks d=new Tea("Lemon Tea");
+	Syso(d.name);//Will it print Lemon Tea ??
+
+3. Predict the output
+class Drinks{
+	String name;
+	Drinks(String name){
+		this.name=name;
+	}
+}
+class Tea extends Drinks{
+	Tea(String name){
+		super(name);
+	}	
+	void serve(String request){
+		Syso(name+" served with "+request);
+	}
+}
+
+Then in the class MainApp, I wrote
+	Drinks d=new Tea("Lemon Tea");
+   	d.serve("biscuits");//Line 1
+
+	if(d instanceof Tea tea){
+		tea.serve("biscuits");
+	}
+
+Let us start exploring cum revising the Collection framework in Java.
+----------------------------------------------------------------------
+java.util.Collection 
+--> java.util.List
+		+ ArrayList and LinkedList classes
+--> java.util.Set
+		+ LinkedHashSet, HashSet and TreeSet classes
+
+java.util.Map
+	+ HashMap, TreeMap and LinkedHashMap classes
+
+Any Collection only allows String, and all wrapper types but not primitive data types.
+Even we can create a collection of user-defined objects.
+
+Key differences between Set and List are
+List allows duplicate elements and supports index based search and removal
+Set does not allow duplicate elements and does not support any sort of index based operations
+
+List ***
+ArrayList gets created with default capacity 10. As the size grows, it internally invokes the copyOf() method to create a new Array and shift the elements to that location. The reference variable is assigned the new address in the process.
+
+#ex
+		List<String> list=new ArrayList<>();
+		System.out.println(list.add("hello"));//true
+		list.add("mango");
+		list.add("blue");
+		list.add("hello");
+		System.out.println(list.size());//4
+		System.out.println(list.toString());
+		System.out.println(list.isEmpty());
+		System.out.println(list.contains("orange"));//false
+		System.out.println(list.get(1));//mango
+		System.out.println(list.indexOf("orange"));
+		//System.out.println(list.remove("hello"));
+		System.out.println(list);
+		
+		//utility class Collections
+		//Collections.sort(list);
+		Collections.sort(list, Collections.reverseOrder());
+		
+		//java 8
+		list.forEach((h)->System.out.println(h));
+		
+		int freq=Collections.frequency(list, "hello");
+		System.out.println("\"Hello\" present "+freq+" times" );//2		
+				
+		//list.clear();//The list will be empty after this call returns
+		
+		//easily club multiple lists or collections using
+		//some methods
+		List<String> list2=new ArrayList<>();
+		list2.add("orange");
+		list2.add("green");
+		list2.add("blue");
+		
+		//list2.addAll(list);//UNION 
+		//list2.retainAll(list);//INTERSECT
+		list2.removeAll(list);//DIFFERENCE
+		System.out.println(list2);	
+
+LinkedList :: Doubly-linked list implementation of the {@code List} and {@code Deque}
+interfaces.  Implements all optional list operations, and permits all
+elements (including {@code null}).
+
+#2 using iterator
+		List<Integer> list=Arrays.asList(2,3,4,51,2,34,5,67);	
+		/*List<Integer> list=new ArrayList<>();
+		list.add(4);list.add(45);list.add(74);list.add(14);*/
+		Iterator<Integer> it=list.iterator();
+		
+		while(it.hasNext()) {
+			int num=it.next();
+			System.out.println(num);
+			if(num>50)
+				it.remove();
+		}
+		System.out.println(list);
+
+
+The story behind using Arrays.asList(arr_ref) method::
+Returns a fixed-size list backed by the specified array. Changes made to the array will be visible in the returned list, and changes made to the list will be visible in the array. 
+
+"fixed-size list backed by the specified array"
+We get UnsupportedOperationException if tried so..
+
+The Iterator we are using is an interface which does support remove() operation.
+Iterators allow the caller to remove elements from the underlying collection during the iteration.
+
+ListIterator is an extension of Iterator. {self learning}
+
+Let us explore the below segment:
+		Set<Integer> set=new HashSet<>();
+		System.out.println(set.add(34));
+		System.out.println(set.add(34));
+
+The HashSet<>() constructor call creates a HashMap behind the scenes
+     /**
+     * Constructs a new, empty set; the backing {@code HashMap} instance has
+     * default initial capacity (16) and load factor (0.75).
+     */
+    public HashSet() {
+        map = new HashMap<>();
+    }
+
+set.add(34);///true false
+It adds the element to the HashMap<E,PRESENT>
+
+ public boolean add(E e) {
+        return map.put(e, PRESENT)==null;
+ }
+
+   // Dummy value to associate with an Object in the backing Map
+    static final Object PRESENT = new Object();
+
+HashSet
+allows NULL value
+order of elements is not guaranteed
+
+LinkedHashSet
+allows NULL value
+order of elements:: insertion based order
+
+TreeSet
+does not allow NULL value
+maintains sorted order (ASCENDING)
+
+How to create a TreeSet to store elements in DESCENDING order?
+Set<Integer> set=new TreeSet<>(Comparator.reverseOrder());
+
+Map interface
+-----------------
+Both HashMap and LinkedHashMap allows NULL as key and value
+TreeMap does not allow NULL key.
+HashMap:: no order of keys guaranteed
+LinkedHashMap:: order of keys will be insertion based
+TreeMap:: keys are in sorted order
+
+#3 example of Map concepts
+  	   Map<String,Integer> map=new HashMap<>();
+
+	   System.out.println(map.put("ab",12));//prev -->NULL
+	   System.out.println(map.put("cd",45));//prev ==>12
+	   System.out.println(map.containsKey("cd"));//false
+	   System.out.println(map.containsValue(12));//false
+	   System.out.println(map.keySet());
+	   System.out.println(map.get("ab"));
+	   
+	   map.forEach((k,v)->System.out.println(k+" : "+v));
+	   System.out.println(map.putIfAbsent("xy",62));
+	   System.out.println(map);
+	   System.out.println(map.getOrDefault("tr",-1));//solving questions
+
+Task
+Given a list of names (String), create a map with the first char as key and count
+of names as value.
+Sample Input
+["abhi","suman","Kaushik","suresh","mani"]
+
+Sample Output
+{"a":1,"s":2,"k":1,"m":1}
+
+Stream API (a trend setting addition in Java 8)
+
+Stream will facilitate working with collections easily.
+It does not hold the data rather creates a pipeline of operations.
+
+We have two types of operations wrt stream concept
+a) intermediate operation like filter, map, distinct, sorted, and so on
+ -- are lazy
+ -- can be chained 
+b) terminal operation like count, toList, forEach , findFirst and so on
+ -- only one can be used with a stream at a time
+
+Once a stream is consumed with terminal operation, we can not use the same stream
+w/o initializing it again. 
+
+Terminal operation returns non stream return value which can be long (count()), list (toList())
+or void (forEach()).
+Intermediate operations are always going to return stream as output. 
+Therefore, you can further pipeline the operation. 
+
+# example of stream API
+import java.util.stream.Stream;
+	  List<Integer> list=Arrays.asList(23,4,12,7,2,4,19,6);
+	  
+	  //list of unique even numbers in sorted manner.
+	  Stream<Integer> stream=list.stream();
+	  
+	  List<Integer> list_=stream.distinct()
+	  		.filter(h->{
+	  			System.out.println("called");
+	  			return h%2==0;
+	  		 })
+	  		.sorted()
+	  		.toList();
+	  		//.count();
+	  		//.forEach(w->System.out.println(w));
+	  
+	  System.out.println(list_);
+
+Task (use Stream API)
+Given a list of Strings, filter and return a new list with strings of length >=5 
+and starting with 'a'.
+
+Sample input
+["abcde","cacbd","aabbcc","abc","dadccd","ccd"]
+
+Sample ouput
+["abcde","aabbcc"]
+
+Why the below code giving compilation problems? How to resolve it?
+
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+class Book{
+	String title;
+	float price;
+	public Book(String title, float price) {
+		super();
+		this.title = title;
+		this.price = price;
+	}
+	
+	public String toString() {
+		return String.format("Title %-15s Price %5s",title,price);
+	}
+	
+}
+
+public class Main {		
+	
+	public static void main(String[] args)  {
+
+	  List<Book> books=new ArrayList<>();
+	  books.add(new Book("Complete Java",312));
+	  books.add(new Book("Learn Java",333));
+	  books.add(new Book("Java In 24hours",276));
+	  
+	  for(Book bk:books) {
+		  System.out.println(bk);
+	  }
+	 
+	  //compile time issue
+	  Collections.sort(books);
+		
+	}
+
+}
+
+Solution
+-------------
+package com;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+class Book implements Comparable<Book>{
+	String title;
+	float price;
+	public Book(String title, float price) {
+		super();
+		this.title = title;
+		this.price = price;
+	}
+	
+	public String toString() {
+		return String.format("Title %-15s Price %5s",title,price);
+	}
+
+	@Override
+	public int compareTo(Book o) {
+		// TODO Auto-generated method stub
+		return Float.compare(this.price, o.price);
+	}
+	
+}
+
+public class Main {		
+	
+	public static void main(String[] args)  {
+
+	  List<Book> books=new ArrayList<>();
+	  books.add(new Book("Complete Java",312));
+	  books.add(new Book("Learn Java",333));
+	  books.add(new Book("Java In 24hours",276));
+	  
+	  for(Book bk:books) {
+		  System.out.println(bk);
+	  }
+	 
+	  //to avoid the compile time issue when sorting a 
+	  //collection of custom objects we must implement
+	  // the java.lang.Comparable interface and override
+	  // the compareTo() method.
+	  //String and all wrapper classes have already DONE so.
+
+	  Collections.sort(books,Collections.reverseOrder());
+	  System.out.println("--- after sorting ---");
+	  for(Book bk:books) {
+		  System.out.println(bk);
+	  }	
+		
+	}
+}
+
+We will discuss in next session 
+a) Thread concept
+b) JDBC	  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+		
+		
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

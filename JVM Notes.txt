@@ -1,0 +1,35 @@
+JVM memory is divided into runtime areas, each with a clear responsibility.
+
+1. Heap
+Stores all objects and arrays
+Managed by Garbage Collector
+Subdivisions:
+Young Generation (Eden + Survivor)
+Old Generation (long‑lived objects)
+
+2. Metaspace  (Java 8+ and in Java 17)
+Stores class metadata (Class definitions, 
+method metadata [Method signature, bytecode])
+Location: Native memory (not heap)
+Has Replaced: PermGen (removed since Java 8)
+
+3. Stack (Java Stack)
+Stores method call frames (Local variables and method calls)
+Each thread has its own stack
+Stores: Primitive variables & Object references (not objects)
+
+4. Program Counter (PC) Register
+Holds address of current instruction
+
+5. Native Method Stack
+Stack for native methods
+
+6. Code Cache
+Stores JIT‑compiled native code
+
+G1 GC
+=====
+Default since Java 9
+Designed for low pause times
+Heap split into regions (not contiguous generations)
+Performs incremental, predictable GC

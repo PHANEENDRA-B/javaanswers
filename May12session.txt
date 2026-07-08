@@ -1,0 +1,560 @@
+Agenda
+--------
+OOP concepts
+
+class and object concept
+
+A class is a blueprint which has all the properties and behavior under one roof.
+An object is an instance of the class; live representation of the class.
+
+class Car{
+	String model;
+	float mileage;
+
+	void displayDetails(){}
+
+	Car(String model){}
+}
+
+When we declare the class, is any constructor added automatically by the compiler?
+Yes, the default constructor (without any arguments) will get added only if no constructors
+are explicitly defined in the class.
+
+If the class has already a constructor with arguments, will a default constructor 
+still be added to the class? No
+
+What is a constructor? What is its role in a class?
+Constructor is a special method which has the same name as the class. 
+This method gets invoked immediately after allocation of memory using new keyword.
+It is used to initialize the state of the object (provide values to the data members).
+
+What is the access modifier of the class and its data members in the above code?
+If we do not mention any access modifier in Java, the default access modifier is package private.
+It means we can access the data members within the class domain and from any other class in the same package.
+
+A class in Java can be package private or public in scope.
+If the class is declared public, we must save the class in a file with the same name as the class. - TRUE
+
+Can I make the constructor of the class private or protected?
+Yes
+
+When shall you make the constructor private?
+This is a key concept related to singleton design pattern.
+According to this pattern, we should only have one instance of the class because the instance
+is expensive to create and maintain.
+
+Database connection instance
+JVM Runtime 
+
+# example of singleton design pattern
+class Demo{
+ 	public static void main(String[] a){
+		Car myCar=Car.getInstance();
+		System.out.println(myCar);
+
+		Car myCar_=Car.getInstance();
+		System.out.println(myCar_);		
+	}
+}
+
+class Car{
+	static Car car=null;
+	private Car(){}
+	static Car getInstance(){
+		if(car==null)
+			car=new Car();
+		return car;
+	}
+}
+
+#2 example of using Runtime class and Garbage collection process
+class Demo{
+ 	public static void main(String[] a){
+		Runtime runtime=Runtime.getRuntime();
+		System.out.println("A| "+(runtime.freeMemory()/1024)+" Kb free mem");
+		Car car=null;
+
+		for(int i=0;i<100000;i++){
+			car=new Car();
+		}
+	
+		System.out.println("B| "+(runtime.freeMemory()/1024)+" Kb free mem");
+		System.gc(); //requesting gc to clear memory
+		System.out.println("C| "+(runtime.freeMemory()/1024)+" Kb free mem");			
+	}
+}
+
+class Car{}
+
+What does adding static modifier mean to a variable or a method?
+It implies that the data member is belonging to the class and not to specific instance.
+We can access such a data member from outside using the class name.
+
+Which is the default package already present in the class?
+java.lang is the default package already present.
+
+Which class is the root class of the java hierarchy?
+java.lang.Object
+
+Tell some methods which we can override from the java.lang.Object class?
+equals()
+toString()
+hashcode()
+finalize()
+clone()
+
+Any method which we cannot override even after inheriting from Object class?
+getClass() because it is declared as final
+
+Let us first chalk out the access modifiers present in Java
+public [Highest Scope]
+protected
+package private
+private [Lowest Scope]
+
+What is the scope of protected access modifier?
+A data member which has protected scope can be accessed from any class in the same package 
+and derived classes in the different package.
+
+What are the uses of "this" keyword?
+The "this" refers to current instance of the class.
+a) used to perform constructor chaining in the same class.
+b) this helps to resolve the ambiguity between local variable and instance variable
+
+#3
+class Car{
+	String model;
+	float mileage;
+	Car(String model, float mileage){
+		this.model=model;
+		this.mileage=mileage;
+		System.out.println(this.model+" "+this.mileage);
+	}
+	Car(float mileage){
+		this("Hyundai X10",mileage);
+	}
+}
+
+Polymorphism =poly+morphos (multiple forms)
+a) compile time polymorphism 
+- method overloading
+- the method name must be same 
+- method signature should vary (order of arguments, data type of arguments, no of arguments)
+- constructors can be overloaded
+- return type has no special role 
+
+b) runtime polymorphism**
+
+Inheritance in Java
+Supports single inheritance and multi level inheritance
+
+What is the use of "super" keyword in Java?
+a) it is used to call the constructor in the base class from the derived class 
+when the derived class instance is created.
+b) it can also be used to call the methods and variables of the base class from the
+child class.
+
+#5
+class Car extends Vehicle{	
+	Car(){
+		super();// will look for no arg constrcutor in the base class
+		System.out.println("Car class constructor");
+	}
+	void print(){
+		System.out.println("Car of fuel type CNG");
+		super.print();
+	}
+}
+
+class Vehicle{
+	Vehicle(){
+		System.out.println("Vehicle class constrcutor");
+	}
+
+	 void print(){
+		System.out.println("Vehicle of year 2026 model");
+	}
+}
+
+What are the rules to be followed in method overriding?
+a) the method overridden in the child class must have the same name and signature 
+as the method inherited from the base class.
+b) the return type of the method overridden in the child class must be SAME or 
+SUB TYPE of the return type of the method inherited from the base class.
+class Car extends Vehicle{	
+	Car(){
+		super();// will look for no arg constrcutor in the base class
+		System.out.println("Car class constructor");
+	}
+	Integer print(){
+		System.out.println("Car of fuel type CNG");
+		super.print();
+		return 0;
+	}
+}
+
+class Vehicle{
+	Vehicle(){
+		System.out.println("Vehicle class constrcutor");
+	}
+
+	Number print(){
+		System.out.println("Vehicle of year 2026 model");
+		return 0;
+	}
+}
+
+c) access modifier of the method overridden in the child class must be same or wider 
+than the access modifier of the inherited method from the base class.
+
+class Car extends Vehicle{	
+	Car(){
+		super();// will look for no arg constrcutor in the base class
+		System.out.println("Car class constructor");
+	}
+	public Integer print(){
+		System.out.println("Car of fuel type CNG");
+		super.print();
+		return 0;
+	}
+}
+class Vehicle{
+	Vehicle(){
+		System.out.println("Vehicle class constrcutor");
+	}
+
+	Number print(){
+		System.out.println("Vehicle of year 2026 model");
+		return 0;
+	}
+}
+
+Can we inherit private data members from the child class? No
+Can we override a private method present in the base class?
+We can have the same name method with same signature in the child class
+but that is not overriding at all.
+
+What are the uses of "final" keyword?
+a) A variable made final cannot be reassigned with different value
+b) We cannot override a method defined final like getClass() method of java.lang.Object
+ class
+c) We cannot inherit a class made final. The java.lang.String class is final.
+
+Exploring the concept of runtime polymorphism in Java.
+		Vehicle vehicle=new Car();
+		vehicle.accelerate();
+
+The reference variable of super type can be used to assign the address of the object of type child.
+When you use such a reference to invoke a method which is present in both base and child class,
+the JVM decides which one to call by checking the object whose address is assigned in the reference 
+variable. Hence, in the above context, the accelerate() method defined in the class Car will be executed.
+
+#6
+class Demo{
+ 	public static void main(String[] a){
+		Vehicle vehicle=new Car();
+		vehicle.accelerate();// compile time error	
+	}
+}
+class Car extends Vehicle{	
+	void accelerate(){
+		System.out.println("The car can accelerate plus apply brakes");
+	}
+}
+class Vehicle{	
+	/*void accelerate(){
+		System.out.println("All vehicles accelerate");
+	}*/
+}
+
+If the method is not present in the base class but you use the reference of the base class to invoke the method defined in the child class, the code will FAIL TO COMPILE.
+At compile time, the compiler checks if the invoked method is present in the class whose reference 
+variable is being used.
+
+In Java 16 and later, the instanceof operator got a pattern matching upgrade, which allows you to both check the type and cast it in a single step.
+
+#7
+class Demo{
+ 	public static void main(String[] a){
+		Vehicle vehicle=new Car();
+		//type checking using instanceof operator
+		//With pattern matching for instanceof
+		if(vehicle instanceof Car c){
+			//down casting 
+			//((Car)vehicle).accelerate();	
+			c.accelerate();
+		}
+	}
+}
+class Car extends Vehicle{	
+	void accelerate(){
+		System.out.println("The car can accelerate plus apply brakes");
+	}
+}
+class Vehicle{	
+	/*void accelerate(){
+		System.out.println("All vehicles accelerate");
+	}*/
+}
+
+Lets move on to the discussion on using "abstract" keyword.
+a) We can add abstract modifier with the class. 
+We cannot instantiate the class
+Can we add non abstract methods to such a class? Yes
+Can we add constructors in such a class? Yes
+Can we add static method in such a class? Yes
+
+If the class has even a single method defined abstract, we must define the class abstract.
+An abstract class may not have any abstract methods. It is rare but possible.
+#example
+abstract class Vehicle{	
+	void accelerate(){
+		System.out.println("All vehicles accelerate");
+	}
+
+	static void checkWheels(){
+		System.out.println("All wheels doing good");
+	}
+
+	Vehicle(){
+		System.out.println("Constructor of Vehicle class");
+	}
+}
+
+A class can extend only one single class in Java.
+A class can implement multiple interfaces.
+We define the interface as a contract which outlines the services to be provided by the interface.
+The actual implementation is to be given by the concrete class implementing the interface.
+
+A class first extends then implements.
+
+Till Java7, an interface could only have public abstract methods.
+From Java8, an interface can have both abstract, non abstract as well as static methods.
+
+An interface with one and only one abstract method is better known as Functional Interface
+An interface without any method is known as MARKER interface like java.io.Serialiozable interface.
+Marker Interface (no methods or fields)
+
+The static method defined in an interface can only be accessed using interface name.
+
+#8
+class Demo{
+ 	public static void main(String[] a){
+		Vehicle vehicle=new Car();
+		vehicle.accelerate();
+		Vehicle.checkWheels();	//should be accessed using interface name
+		vehicle.drive();		
+	}
+}
+class Car implements Vehicle{	
+	public void accelerate(){
+		System.out.println("The car can accelerate plus apply brakes");
+	}
+}
+interface Vehicle{	
+	void accelerate();// access modifier is public 
+
+	static void checkWheels(){
+		System.out.println("All wheels doing good");
+	}
+
+	default void drive(){
+		System.out.println("Right hand driving in India");
+	}	
+}
+
+#9
+interface Iface1{
+	void meth();
+}
+interface Iface2 extends Iface1{
+	void doJob();
+}
+class Sample implements Iface2{
+	public void doJob(){}
+}
+
+/* the code fails to compile
+the meth() abstract method which comes to Sample class indirectly has not been implemented
+in the Sample class
+Cause: Sample is not abstract and does not override abstract method meth() in Iface1
+*/
+
+#10
+class Demo{
+ 	public static void main(String[] a){
+		Sample s=new Sample();
+		System.out.println(s.str);//jim	
+	}
+}
+interface Iface1{
+	String str="jim";
+}
+interface Iface2 extends Iface1{
+	String str="jam";
+}
+class Sample implements Iface1{}
+
+Example of functional interface and lambda expression.
+#11
+class Demo{
+ 	public static void main(String[] abc){		
+	//Sample s=new Sample();
+	//System.out.println(s.operate(4,8));
+	/*ICompute ref=new ICompute(){
+		public int operate(int a, int b){
+			return a*b;
+		}
+	};*/
+	      //using lambda expression (concise way of writing the above logic)
+		ICompute ref=(a,b) -> a+b;
+		System.out.println(ref.operate(4,8));
+
+		ref=(x,y)->((int)Math.pow(x,y));
+		System.out.println(ref.operate(4,8));
+	}	
+}
+/*class Sample implements ICompute{
+	public int operate(int a ,int b){
+		return a+b;
+	}
+}*/
+@FunctionalInterface
+interface ICompute{
+	int operate(int a, int b);
+	//void greet(String message);
+}
+
+
+Task [15 mins]
+-----
+interface ICompute{
+	int doAction(String input);
+}
+class Sample{	
+	void print(ICompute ref, String str){
+		//write code
+	}
+}
+a) Call print() from main method with task to return length of the input string
+b) call print() from main method with task to return the number of vowels in the input string
+
+
+Agenda for next session will be
+Exception handling, File handling basics, Date related concept
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

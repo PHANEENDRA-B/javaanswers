@@ -1,0 +1,368 @@
+Agenda
+----------
+Exception handling
+File handling basics
+Date API (old and new)
+
+1. Predict the output:
+char ch='a';
+ch++;
+System.out.println(ch);//b
+
+Explanation:
+ch++; => ch=(char)(ch+1);
+The char is transformed into numeric equivalent (ascii)
+Then incremented by 1
+Again down casted back to char
+
+2. Why the below code shows compile time error?
+byte a=5;
+byte b=5;
+byte c=a+b;//compile time error
+System.out.println(c);
+
+Explanation:
+a+b 
+Java promotes the byte operands to the higher data type int
+byte c= value_is_of_type_int
+byte c=(byte)(a+b)
+
+3. Predict the output:
+short s=Short.MAX_VALUE;//2^15 -1
+s++;
+System.out.println(s);
+
+Explanation:
+The output will be Short.MIN_VALUE
+In Java, short is signed 16-bit and overflow wraps around automatically because arithmetic is done in int and then cast back to short.
+
+4. 
+Using Character wrapper class how can you count the digits present?
+String s="a1b2c3";		
+	//isDigit() function this can be achieved.
+		char arr[]=s.toCharArray();
+		int count=0;
+		for(char ch:arr) {
+			if(Character.isDigit(ch))
+				count++;
+		}
+		System.out.println(count);
+
+
+5. How to use Integer wrapper class for conversion between base system?
+int num=10_1;
+	//how using Integer wrapper class you can show the decimal 
+		//and hex equivalent of this number
+		String hexNum=Integer.toHexString(num);
+		System.out.println(Integer.toString(num,8));
+		System.out.println(hexNum);
+
+6. 
+String name="terminated";
+		//how to find if the second and second last char is same or not.
+		//use String API methods
+		
+		System.out.println(name.charAt(1)==name.charAt(name.length()-2));
+		System.out.println(name.substring(1,2).equals(
+				name.substring(name.length()-2,name.length()-1)));
+		
+//duplicate character finding		System.out.println(name.indexOf('e')==name.lastIndexOf('e'));//with extra efforts
+
+
+Exception Handling
+====================
+Exception is an abnormal situation which abruptly terminates the program.
+Handling an exception in Java can be done either by using try-catch-finally blocks
+or by delegating the exception using throw and throws clause.
+
+The java class hierarchy for exceptions is as follows:
+java.lang.Throwable
+- java.lang.Error
+	- java.lang.VirtualMachineError
+		- java.lang.StackOverflowError
+- java.lang.Exception
+	- java.io.IOException
+	- java.sql.SQLException
+	- java.lang.RuntimeException
+		- java.lang.NullPointerException
+		- java.lang.ArithmeticException
+		- java.io.InputMismatchException 
+
+Error is irrecoverable.
+Exception can be handled; but Error cannot.
+
+What do you mean by checked and unchecked exception in Java?
+
+An exception class if inherits the java.lang.Exception class is known as checked exception.
+IF you use any method which throws a CHECKED exception then COMPILER ensures that the caller method 
+either handles the exception using try catch block or further delegates the exception using throw clause.
+
+Example:
+FileWriter fw=new FileWriter("myfile.txt",true);
+The above line fails to compile until I surround the code with try-catch or further delegate the exception.
+This is because the constructor of FileWriter class throws IOException which is a type of Exception.
+
+An exception class that inherits java.lang.RuntimeException class is known as unchecked exception.
+If any method throws such an exception like NullPointerException the compiler does not force the coder to surround the code within try catch block or further delegate the exception.
+
+Key points about using try-catch-finally block
+a) try block cannot be kept alone
+It has to be accompanied by catch, catch-finally, catch(s)-finally, finally
+b) we can nest try-catch block within another catch block
+c) finally block is used to write the clean up to deallocate any used resources.
+d) From Java 7, we can pass multiple exceptions in the same catch block
+
+	String snum="0";
+	try {
+		int a=25;
+		int b=Integer.parseInt(snum);
+		System.out.println(a/b);
+			
+	}catch(ArithmeticException|NullPointerException|NumberFormatException ex) {
+		System.out.println(ex.getMessage());
+	}
+		
+e) finally executes always [only one exception until it is blocked by System.exit(0)]
+
+f) finally executes always even if the code raises an exception and gets handled by the 
+caller method catch block
+
+public class Main {		
+	public static void doJob(String snum) throws Exception {
+		try {
+			int a=25;
+			int b=Integer.parseInt(snum);
+			System.out.println(a/b);
+			if((a/b)%5==0)
+				throw new Exception("Some exception planned");		
+		}finally {
+			System.out.println("A");
+		}
+	}	
+	public static void main(String[] args) {
+			String snum="5";			
+			try {
+				doJob(snum);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}finally {
+				System.out.println("B");
+			}
+	}
+
+}
+
+How we create custom exception in Java?
+To create a checked custom exception extend java.lang.Exception class
+To create an unchecked custom exception extend java.lang.RuntimeException class.
+
+Can we add multiple exception class names in the throws clause?
+Yes, we can write like this 
+	throws NullPointerException,ArithmeticException,Exception 
+
+# Examine the below code:
+try{
+	//code present
+}
+catch(Exception e){}
+catch(FileNotFoundExeption e){}
+
+Will the code block compile??
+No, it fails to compile as catch block with super type should not be before a catch block of sub type.
+This would make the code unreachable.
+
+File handling basics
+----------------------
+java.util.Scanner class to accept user input
+
+Scanner ref=new Scanner(System.in);
+ref.nextInt(); => int
+ref.nextDouble(); =>double
+ref.next() or ref.nextLine(); ==>string
+
+There is no such specific method for character input. 
+Hence we can use ref.next().charAt(0) if required.
+
+ref.nextBoolean() ==> to accept true or false as a value
+
+What is System.in, System.out and System.err used for?
+The in, out, err are static reference variables defined in the java.lang.System class.
+System.in refers to java.io.InputStream class
+System.out refers to java.io.PrintStream class
+
+You can read a file in Java by creating a File object and passing it to a Scanner, then using methods like hasNextLine() and nextLine() to read the file line by line.
+
+IO Stream
+- Byte Stream is used to work with binary data like images
+- InputStream and OutputStream ; they are both abstract classes which expose the methods read() and write() respectively
+- Some concrete implementations of them are FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream and ...
+
+
+- Character Stream is used to work with character data(more human readable)
+Reader and Writer both again being abstract classes. They also expose the abstract method read() and write() respectively.
+
+-- Bridge classes to convert byte stream to character stream and vice versa
+
+InputStreamReader:  * A class for turning a byte stream into a character stream. Data read from the
+ * source input stream is converted into characters by either a default or a
+ * provided character converter.
+
+-- try with resource --
+The resource get closed automatically without explicitly mentioning.
+
+In Java, the try-with-resources statement and the Closeable interface are closely related because try-with-resources is designed to automatically close resources that implement either java.io.Closeable or java.lang.AutoCloseable.
+
+#
+try(FileInputStream fis=new FileInputStream("data.txt");){	
+			
+			int k=0;
+			while((k=fis.read())!= -1) {
+				System.out.println("Read: "+(char)k);
+			}			
+						
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+
+#
+try(InputStreamReader isr=new InputStreamReader(System.in);
+				BufferedReader br=new BufferedReader(isr);){
+				System.out.println("Write here");
+				String s="";
+				while((s=br.readLine())!= null) {
+					System.out.println("Read: "+s);
+				}		
+			
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+
+Reads text from a character-input stream, buffering characters so as to provide for the efficient reading of characters, arrays, and lines.
+
+Date API (old and new)
+-------------------------
+From Java 8, a huge change has happened in the world of dates.
+Date is no longer MUTABLE; Date has been broken into LocalDate, LocalTime, LocalDateTime
+The method names are very friendly to the coder.
+java.time is the key package.
+
+#example
+package com;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+
+public class Main {		
+	
+	public static void main(String[] args) throws ParseException {
+		
+		//java8
+		LocalDate today=LocalDate.now();
+		
+		LocalTime current_time=LocalTime.now();
+		
+		System.out.println("Today is: "+today);
+		System.out.println("Time now: "+current_time);
+		
+		//String to LocalDate
+		DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate date_=LocalDate.parse("2028-07-31",formatter);
+		System.out.println(date_);
+		
+		System.out.println(today.isBefore(date_)); 
+		System.out.println(today.isLeapYear()); 
+		
+		System.out.println(today.plusMonths(2));
+		System.out.println(current_time.plusHours(3));
+		
+		//difference between two dates
+		Period term=Period.between(today, date_);
+		System.out.println(term);
+		System.out.println(term.getYears()+"years | "+term.getMonths()+ "months");
+		System.out.println(term.toTotalMonths()+ "months");
+	}
+
+}
+
+
+In Java 7, Date objects were MUTABLE  and for date manipulation we used SimpleDateFormat plus Calendar class.
+
+#example
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class Main {		
+	
+	public static void main(String[] args) throws ParseException {
+		
+		//java7
+		Date date=new Date();
+		System.out.println(date);
+		
+		//convert String to Date object
+		SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+		String someDate="2026-05-31";
+		Date date_=formatter.parse(someDate);
+		System.out.println(date_);
+		
+		if(date.before(date_)) {
+			System.out.println("We are yet to reach the other date");
+		}else {
+			System.out.println("We have reached or crossed the other date");
+		}
+		
+		//any further calculations on date like adding 5 months or finding leap year
+		//We have to use Calendar abstract class.
+		Calendar calendar=Calendar.getInstance();
+		System.out.println(calendar.getTime()); 
+		calendar.add(Calendar.MONTH, 2);
+		System.out.println(calendar.getTime()); 		
+			
+	}
+
+}
+
+Agenda for tomorrow:
+Collection framework, Lambda and Stream API
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

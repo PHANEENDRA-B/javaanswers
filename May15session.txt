@@ -1,0 +1,177 @@
+Agenda
+Thread concepts and JDBC
+
+JDBC
+-----
+Arranging the proper jar file (database provided dependent)
+Linking the jar file with the application
+Creating the Connection object using certain specific details (url, username, password and driver)
+Write the query using Statement or PreparedStatement reference
+Fetching the results into a ResultSet object
+Traversing the ResultSet to display the records fetched.
+
+Why do we need jar file in JDBC?
+- Your Java code speaks Java language
+- Database (Oracle/MySQL) speaks SQL language
+- These JAR files act as a translator + driver
+
+On my system, I found the jar in the location
+C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib
+
+Create a Java project on the Eclipse IDE.
+Right click the Java project >> Build Path >> Configure Build path
+
+Open the [libraries] tab
+On the left you will see [Add External Jars] button
+Select classpath and then press the [Add External Jars] button
+PRovide the location of the ojbdc6.jar and click Okay
+
+The jar file will get visible in Referenced Libraries
+
+Connection cn=DriverManager.getConnection(url, username, password);
+
+** java.sql.Connection is an interface. So are Statement, PreparedStatement, ResultSet
+
+We will create the Statement object that will run the query.
+Statement stat=conn.createStatement();
+				
+We will get the data retrieved. We will store in the ResultSet.
+ResultSet results=stat.executeQuery(query);
+where query is the query string (SELECT * FROM hr.employees)
+
+We will traverse the ResultSet.
+while(results.next()) {
+	Person obj=new Person(results.getString(1),results.getString(2),
+results.getFloat(3),results.getDate(4).toLocalDate());
+	System.out.println(obj);
+}
+
+DriverManager
+|
+V
+Connection -> Statement|PreparedStatement -> ResultSet
+
+Key differences between Statement and PreparedStatement
+---------------------------------------------------------
+Statement is used for simple queries without any dynamic input
+"select first_name,last_name from person"
+
+PreparedStatement is used for dynamic / parameterized queries (which take inputs at run time)
+
+"select first_name,last_name from person where city=? and age=?"
+This ? is the placeholder.
+
+setParameter(1,"Kanpur");
+setParameter(2, 21);
+
+Statement interface is extended by PreparedStatement interface.
+
+It pre-compiles the query and creates an optimized plan to execute some query.
+
+#1
+record Person(String fname,String lname,float salary, LocalDate joining) {}
+
+	public static void main(String[] args) {
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String username = "hr";
+		String password = "hr";
+		try (Connection conn = DriverManager.getConnection(url, username, password)) {
+			if (conn != null) {
+				System.out.println("Successfully connected to Oracle Database!");
+				String query="select first_name,last_name,salary, hire_date "+ 
+						"from hr.employees where department_id in (10,20)";
+				
+				Statement stat=conn.createStatement();
+				ResultSet results=stat.executeQuery(query);
+				while(results.next()) {
+					Person obj=new Person(results.getString(1),results.getString(2),results.getFloat(3),results.getDate(4).toLocalDate());
+					System.out.println(obj);
+				}			
+				
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+
+#2
+public static void main(String[] args) {
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String username = "hr";
+		String password = "hr";
+		try (Connection conn = DriverManager.getConnection(url, username, password)) {
+			if (conn != null) {
+				System.out.println("Successfully connected to Oracle Database!");
+				String query="select first_name,last_name,salary, hire_date "+ 
+						"from hr.employees where employee_id=?";
+				
+				PreparedStatement stat=conn.prepareStatement(query);
+				stat.setInt(1, 105);// fill the blanks
+				
+				ResultSet results=stat.executeQuery();
+				while(results.next()) {
+					Person obj=new Person(results.getString(1),results.getString(2),results.getFloat(3),results.getDate(4).toLocalDate());
+					System.out.println(obj);
+				}			
+				
+			}
+		} catch(SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+}
+
+ResultSet is a storage of the data fetched from the query executed from the Java application.
+When first time you use the ResultSet reference to call the next() method, the pointer moves to point
+to the first row in the queried data. Now, with every call, the pointer points to the next rows.
+This process continues till you reach the state with no more records and get the value false.
+
+Separation of Concerns will be very important.
+
+The connectivity coding should be following singleton design pattern
+The connection obj should be in a separate class
+and then use it to obtain either Statement or PreparedStatement references.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 		
+	

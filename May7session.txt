@@ -1,0 +1,637 @@
+"SAP ABAP (Advanced Business Application Programming) is a high-level programming language developed by SAP SE, primarily used for creating and customizing applications within the SAP ecosystem. It supports both procedural and object-oriented programming paradigms, making it versatile for various enterprise-level software development needs."
+
+Stage 1 : ANSI SQL & Java concepts
+approx. 1.5 weeks (from 7th May till 15th May)
+18th May : Stage 1 qualifier/delta assessment either KBA or SBA ??
+We will every day share some assignments/hands-on based on the covered modules.
+We will discuss the answers along with explanation in the next session
+
+Rating for yourself on 1 to 5 scale (5 is the highest)
+Java 8 (all of us have studied and explored; some also aware of Java 17 and advanced concepts like Spring framework)
+Rating provided :: 4 (on average)
+
+Stage 2 : SAP ABAP
+
+In your curriculum
+Stage 1 qualifier (written assessment)
+Stage 2 commence post that
+Interview (Face to Face)
+Interim
+Final 
+
+Interim evaluation, you can expect questions 20-30% from Stage 1 concepts and rest from Stage2 concepts covered/discussed 
+
+7th and 8th :: ANSI SQL
+-------------------------------------------
+SQL and its types
+SELECT query and its sub clauses
+Functions (scalar, aggregate as well as analytic functions like dense_rank, rank, rownum and so on)
+JOINS
+Subquery of all types
+We will also explore db objects other than table which includes view and index
+
+From 11th ... till 15th :: Java 8/17 (in mind) 
+-------------------------------------------
+OOP concepts
+Functional Interface and Lambda expression
+Exception Handling
+Collection framework
+Stream API
+File handling (basics)
+Thread basics
+JDBC 
+** new features in the language
+
+Is SQL and Java software installed on your system?? NO
+
+We will start practicing using online MySQL or Oracle platform
+
+
+ANSI SQL
+Structured Query Language (5th gen language used to write queries on a respective database platform)
+- DDL [CREATE, ALTER, TRUNCATE, DROP] 
+- DML [UPDATE,INSERT, DELETE]
+- DCL [GRANT, REVOKE]
+- TCL [COMMIT, ROLLBACK, SAVEPOINT]
+- DQL [SELECT and its friend clauses]
+
+Constraints we get to use in SQL
+Constraints are rules applied to the entered data into the tables.
+To prevent invalid data, or duplicate data from being inserted into a column
+We can add unique constraint or something equivalent.
+
+Types
+------
+Primary key
+Helps to identify a row from the others by a unique value.
+Such a column cannot contain NULL values
+Only one primary key on a table
+
+Can I make multiple columns behave as a sole primary key?
+Yes, we create a composite primary key.
+
+Is any index created, when we add a primary key to a table?
+Yes, it creates a unique index on the primary key column
+
+UNIQUE constraint
+Such a column shall not have any duplicate value
+Is NULL value allowed? NULL
+
+How can you define NULL in SQL terms?
+A value which is unknown or unassigned.
+It is not same as space or zero.
+
+NOT NULL constraint
+
+CHECK constraint
+It is used to restrict the values to be entered into a column of a table.
+Domain Integrity
+Gender in a predefined set of values
+Age between a range
+
+Foreign Key constraint
+A column in child table that refers to primary key column of the parent table.
+The parent table may be same or different from the child table.
+
+Your manager id is the employee id of another employee
+Both the details are maintained in the same table "employees".
+
+Key points
+------------
+Assuming the situation emp table (CHILD) and dept table (PARENT)
+a) We cannot delete a dept record from the parent table if there are dependent records
+present in the emp (child) table.
+
+b) We cannot add a new record in the emp (child) table if there is no matching dept record
+present in the parent table.
+
+Exception to the rule
+----------------------
+ON DELETE CASCADE
+If while defining the child table, we mention the clause ON DELETE CASCADE
+The child records get automatically deleted if the concerned parent record is removed.
+
+ON DELETE SET NULL
+If while defining the child table, we mention the clause ON DELETE SET NULL
+The respective FK column in the affected child records will be set to NULL
+if the concerned parent record is removed.
+
+create table exam_voucher(
+v_id int primary key auto_increment,
+exam_name varchar(100) not null,
+exam_center varchar(100)
+);
+ 
+-- create the child table
+create table candidate(
+id int primary key auto_increment,
+name varchar(100) not null,
+email varchar(100) not null,
+exam_id int,
+foreign key(exam_id) references exam_VOUCHER(v_id) ON DELETE SET NULL
+);
+ 
+--  TO SEE THE STRUCTURE
+DESC candidate
+
+Schema diagram
+Yellow Key :: PK
+Blue Filled Diamond :: NOT NULL
+Blue Outline Diamond :: NULL allowed
+
+Red Filled Diamond :: FK + NOT NULL
+Red Outline Diamond :: FK + NULL allowed
+
+desc exam_voucher
+
+insert into exam_voucher
+values(101,'Java Core','B1,TR10');
+
+insert into exam_voucher(exam_name,exam_center)
+values('Java Collections','B1,TR10');
+
+select * from exam_voucher
+
+desc candidate
+
+insert into candidate(email,name,exam_id)
+values('gayathri@cognizant.com','Gayathri',101),
+('avinash@cognizant.com','Avinash',101),
+('vishnu@cognizant.com','Vishnu',102);
+
+select * from candidate
+
+-- effect of adding ON DELETE SET NULL
+delete from exam_voucher
+where v_id=102;
+
+The affected column of the dependent records with v_id=102 become NULL post
+DELETE command
+
+Key points
+a) DELETE or UPDATE command without WHERE clause affects all the rows in the table.
+b) We must provide column list when there is some column for which we do not 
+want to provide a value
+Or we want to change the order of the columns in the insert command
+
+How to apply ALTER command on this candidate table?
+Using ALTER command we modify the structure of the table (and not the data).
+Examples:
+-- added a new column
+alter table candidate
+add phone varchar(10) not null;
+
+-- modify the data type of existing column
+alter table candidate
+modify name varchar(150) not null;
+
+We can have a quick 15 minutes break. We will resume from 11:15 am.
+
+What are the differences between DROP TABLE and TRUNCATE TABLE command?
+DROP TABLE will remove the structure along with the contents of the table
+TRUNCATE TABLE will retain the structure but removes the contents from the table.
+
+What is the result of below query?
+The candidate table already exists
+
+CREATE TABLE new_candidate
+AS
+select name as cname, email, phone 
+from candidate
+where 23=67;
+
+The table new_candidate will be created as mentioned in the query without any data copied.
+No data gets copied as the condition evaluates to false.
+
+General syntax
+-------------------
+SELECT col_list
+FROM tabname
+JOIN.. ON
+WHERE
+GROUP BY
+HAVING
+ORDER BY
+
+What is the SQL execution flow based on above clauses?
+In SQL, the way a query is written differs from how it is logically executed by the database engine. Understanding this flow is essential for writing correct, optimized, and maintainable queries.
+Logical execution order typically follows these steps:
+FROM
+JOIN ..ON
+WHERE
+GROUP BY 
+HAVING
+SELECT
+ORDER BY
+
+We will first explore the ORDER BY clause.
+Sort the records before display
+Default SORT order: ASC
+
+1. Predict the output
+select ename,job,hiredate from emp
+order by job, hiredate desc;
+
+The records will be displayed in sorted order
+of job (asc order) and hiredate (desc order)
+
+Key point: DESC will not affect the column mentioned near to it.
+
+# ename	job	hiredate
+SCOTT	ANALYST	2008-05-16
+ARVIND	CFO	2026-03-25
+SMITH	CLERK	2010-02-11
+MILLER	CLERK	2009-08-01
+ADAMS	CLERK	2008-09-11
+JAMES	CLERK	2008-05-16
+
+2. Predict the output
+select ename,job,hiredate from emp
+order by 3,2;
+
+The records will be displayed sorted by hiredate and then job
+
+# ename	job	hiredate
+KING	PRESIDENT	2008-05-01
+SCOTT	ANALYST		2008-05-16
+JAMES	CLERK		2008-05-16
+TURNER	Sn_sales	2008-08-16
+
+Can I sort the records based on some expression/calculation? YES
+
+select ename,job,hiredate, (sal+500)*12 as annsal
+from emp
+order by annsal;
+
+The table has the column sal (monthly salary)
+(sal+500)
+
+800=>1300
+1300*12=>X
+ 
+What operators we use in the WHERE or SELECT clause?
+a) Arithmetic operators
+b) Comparison <,<=, >, <> !=, >=
+c) Logical AND OR NOT
+d) RANGE between .. and .. (both limits are inclusive)
+e) DISCRETE in(a,b,...,n)
+f) DISTINCT #to display unique values only
+g) WILD SEARCH  [LIKE operator with % and _ symbols]
+h) IS NULL || IS NOT NULL (for null checking)
+
+Predict the output
+select ename, job, hiredate
+from emp
+where hiredate like '2008%';
+
+Emps who joined in 2008
+
+-- who have I as the second character in their name
+select ename, job, hiredate
+from emp
+where ename like '_I%';
+
+-- who have more than one 'T' in their name
+select ename, job, hiredate
+from emp
+where ename like '%t%t%';
+
+How to perform any operation on a column with NULL value?
+
+select ename,sal,comm, sal+comm as in_hand_sal
+from emp
+where hiredate like '2011%'
+
+# ename	sal	comm	in_hand_sal
+ALLEN	1600.00	300.00	1900.00
+WARD	1250.00	500.00	1750.00
+JONES	2975.00		
+MARTIN	1250.00	1400.00	2650.00
+CLARK	2450.00		
+
+Cause: Any operation on a column with NULL value evaluates to NULL.
+Solution: We have to modify NULL with some NOT NULL value based on data
+type.
+
+--MYSQL specific
+select ename,sal,comm, sal+ifnull(comm,0) as in_hand_sal
+from emp
+where hiredate like '2011%';
+
+--Oracle
+vselect ename,sal,comm, sal+nvl(comm,0) as in_hand_sal
+from emp
+where hiredate like '2011%';
+
+To figure out records with NULL value, use either IS NULL or IS NOT NULL.
+We cannot compare two null values.
+
+ANSI SQL functions
+----------------------
+Character based
+upper(),lower(),length(),reverse(), replace(), trim(), concat(), lpad(), rpad(),
+substring(), instr(), conv(), and many more...
+
+select CONCAT(upper('SQl query'), lower(' ASSIGNMENT')) as data
+select length('SQl query') -- 9
+select substring('SQl query',1,3) as portion
+select instr('SQl query','q') -- if present show pos [2] if not present shows 0
+select replace('SQL query in MySQL','SQL','Java')
+-- case insensitive 
+select lpad('7127',10,'*')
+*****4567
+
+Numeric 
+round, ceil, floor, abs, sqrt, pow, trunc and many more..
+
+select round(675.78),round(675.78,1), round(675.78,-1);
+select truncate(675.78,1); -- second argument is MUST
+select ceil(675.78); -- 676
+select floor(675.78); -- 675
+
+Date based function (MYSQL based)
+select current_date, current_time, current_timestamp()
+select extract(hour from current_time)
+select extract(year from current_date)
+
+-- mysql proprietary
+select monthname(current_date), dayname(current_date)
+
+-- how to add days/month/year to a date
+select adddate(current_date, interval 5 month)
+
+-- how to convert string to date
+select date('2026-05-17') -- ISO Format[yyyy-MM-dd]
+
+-- how to display in another format
+-- MYSQL style (will not work in Oracle same way; Oracle has its own set of date functions)
+select date_format(adddate(current_timestamp,interval 3 month),'%a %b %y %Y %w %W %h %H');
+
+MISC function
+----------------
+IFNULL function converts NULL to some other NOT NULL value
+NULLIF function
+select nullif('ab','AB'), nullif('ab','cd')
+-- if both are same returns NULL
+-- if both are not same returns the first value
+
+Another real time example of using NULLLIF to avoid arithmetic exception
+--------------------------------------------------------------------------
+SELECT SalesAmount / NULLIF(Quantity, 0) AS PricePerUnit
+FROM Orders;
+If Quantity is 0, NULLIF(Quantity, 0) returns NULL, preventing a division-by-zero error.
+The result will be NULL instead of an error.
+
+COALESCE function returns the first non null value present from a list of columns.
+COALESCE can handle multiple arguments and return the first non-null value. 
+
+-- display the name and first available contact mode for each customer
+-- priority phone,email, mailing_add, 'na'
+select cname,coalesce(phone,email,mailto, 'na') as first_contact_mode
+from contact_info
+
+We will explore CASE statement in SQL.
+select ename,sal,case 
+when sal<1000 then 'C'
+when sal between 1000 and 3000 then 'B'
+else 'A' end as grade_based_sal
+from emp;
+
+Summary
+-----------
+DDL and DML commands
+SELECT query and its sub clauses (WHERE, ORDER BY)
+Operators and Scalar functions
+
+Agenda
+--------------
+We will start exploring
+Aggregate functions
+GROUP BY and HAVING
+Analytic function
+Joins in SQL
+Subquery examples
+
+I will be sharing practice1 and practice2 (2 documents)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Date related
+Misc
+ifnull()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

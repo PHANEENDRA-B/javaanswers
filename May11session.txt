@@ -1,0 +1,585 @@
+Agenda
+-------
+Java introductory (basics to array, String, wrapper class)
+
+In the last session we discussed on Joins, sub queries and such concepts.
+
+1. How will you explain the need of outer join with an example?
+All courses and the candidates (even if no candidate has joined a course, the course should still be fetched in the query)
+course_id(PK), course_name, launch_date
+id, name, course_id(FK),enrollment_date
+
+from course left join candidate;
+
+2. How will you display the candidate's name(s) who have enrolled for atleast 2 courses.
+-- we will join the tables
+-- perform group by based on candidate_id column
+-- add having clause with condition count(course_id) >=2
+
+3. How will you find the course name(s) in which no candidate has enrolled yet?
+-- we will perform outer join on the tables [course]
+-- we will then filter based on the condition
+where candidate_id is null
+
+4. Why will you write a view in SQL?
+-- it helps to hide the query complexity (as the joins, column names can be hidden)
+-- it also helps to not expose the complicated expressions in the query.
+
+5. How will you find which candidates have enrolled for the course
+within 5 days of course launch date?
+course_id(PK), course_name, launch_date
+id, name, course_id(FK),enrollment_date
+-- we will join the tables
+-- where enrollment_date <= launch_date+5
+
+Java introductory (basics to array, String, wrapper class)
+We will keep Java 8 in mind
+We will also explore certain concepts beyond Java 8 as and when needed.
+
+The key terms we come across as we start exploring Java
+are: JDK, JRE, JVM
+
+JDK=JRE+APIs
+We need to install JDK on our system to make Java applications.
+JRE is enough to run an application already developed using Java concepts.
+
+JDK is PLATFORM DEPENDENT.
+It is because of JDK that the Java code we write becomes platform independent.
+
+The Java source code is compiled to bytecode.
+This bytecode is understood and managed by the java virtual environment.
+The bytecode is platform neutral and can be transferred across systems to be executed 
+later on.
+
+Sun Microsystems
+Oracle purchased Java when the version Java 7 was there.
+They then launched Java 8 with much awaited changes like Date API, Functional Programming
+(lambda, Stream API, Functional Interface,...)
+
+With next module, Oracle changed the plan of launching Java to a 6 months model.
+Java 11, 17, 21 has been the LTS versions of Java.
+
+In the intermediate versions, they shared some preview features.
+A preview feature is complete and working fine but it may not be present or 
+might evolve in the next version launched.
+
+Key features of Java
+--------------------
+a) robust
+b) type safety
+c) platform neutral
+d) support to build a wide range of applications
+e) garbage collection
+
+JVM it has some important memory areas: (Java 8 and above)
+a) Heap where any Java object you create gets its memory assigned from
+b) Stack where any method call are stored; local variables get their memory from
+Every thread has its own stack
+c) Metaspace which contains the class definitions and metadata
+
+To start with explore Java, 
+we can say Java is not a pure object oriented prog. language.
+
+We can write a program and execute it even without creating an instance.
+By writing the code with a static method.
+
+We get the privilege to directly compile and execute Java code using java application launcher. We are not forced to compile java code first and then execute it.
+java Demo.java (No physical creation of .class file happens)
+
+- The source file might have multiple class declarations but the first class should have the main method.
+- This is only for quick exploration of newly added features; hence does not support multiple files and import statements.
+
+In Java 9, the java command was enhanced to allow direct execution of a single-file Java program without explicitly compiling it first with javac.
+
+class Sample{
+	static public void main(String[] abc){
+		System.out.println("Hello Everyone!!");
+		main(24);		
+	}
+
+	//can I add a method call main() expllicitly?
+	static public void main(int num){
+		System.out.println("number: "+num);
+	}	
+}
+
+We applied method overloading into this example
+What key points should I consider in method overloading?
+a) method name must be same
+b) different parameters [number of parameters, data type of parameters, order of parameters]
+c) return type HAS NO ROLE in method overloading
+
+What is this "String[] abc" in the main method out here?
+Represents an array of String objects
+a) Any special term for it? command line arguments
+b) Why String type always? Because String is universal data type that can accept any value
+
+#1
+class Sample{
+	static public void main(String[] abc){
+		if(abc.length==0)
+			System.out.println("No argument passed");
+		else{
+			for(int i=0;i<abc.length;i++){
+				System.out.println(abc[i]);
+			}
+		}		
+	
+	}	
+}
+//java Demo.java hi 1234 true java
+//array length is a PROPERTY so no () sign
+
+#2 perform the sum of the numbers passed thru cmd line args
+How shall I convert the String to numeric value?
+Integer.parseInt(abc[i])
+
+In Java, there is no such garbage value concept.
+Any static or instance variable is initialized to default value based on data type
+byte short int long -->0
+float, double -->0.0
+boolean --> false
+char -->\u0000
+
+But any variable declared locally is not initialized automatically. It has to be done explicitly 
+to avoid compilation error. Initialize before using it is must for local variable
+
+How will you describe a wrapper class?
+Every primitive data type has a wrapper class.
+- It helps to perform conversion from value type to reference type aka boxing and vice versa
+- short (Short) and long (Long) | int (Integer) and char (Character)
+- It makes it easier to convert from String to primitive type via wrapper class and back
+parseXXX() and valueOf() 
+- The Java collection framework relies heavily on Wrapper class objects.
+
+What are the naming conventions we should follow in Java?-
+- A class name should be starting with capital letter
+- If multiple words present then each word first letter should in ucase like ShoppingCart
+- A class name should always be NOUN
+
+- A variable name should be starting with lower case
+- If multiple words present then second word onwards first letter should be in ucase like basicPay,joiningDate
+
+- A method name should be starting with lower case
+- If multiple words present then second word onwards first letter should be in ucase like editProfile(),
+changePassword(), addToCart()
+- A method name should always be VERB
+
+- A package name should be entirely in lower case.
+- If multiple words, the format should be separated by dot symbol like com.controller.HomeController
+java.util.Date, java.util.ArrayList
+
+Next, we will start exploring array concept in Java followed by String and its related classes.
+
+Array is a contiguous memory location used to store homogenous elements.
+In Java, the array is treated as an object so memory allocation happens on the heap of JVM.
+The elements are initialized to default value based on the data type of the array.
+
+#2
+import java.util.Arrays;
+
+class Sample{
+	
+	static public void main(String[] abc){
+	    long arr[]={96,34,56,78,14};//new long[5];
+
+	   // traverse an array
+	    //for(long n:arr)
+		//System.out.println(n);
+
+	   //utility class to work with array elements
+	   //java.util.Arrays	
+		
+	   System.out.println(Arrays.toString(arr));//one line
+	   Arrays.sort(arr);//arranged in ASC order
+	    System.out.println(Arrays.toString(arr));
+
+	  // to perform a deep copy
+	  long arr_[]=Arrays.copyOf(arr,arr.length);
+
+	  Arrays.fill(arr,0,2,100);// to replace an element with some other value; endIndex is exclusive
+	  System.out.println(Arrays.toString(arr));
+	  System.out.println(Arrays.binarySearch(arr,78));// zero based index position if found
+
+	}	
+}
+
+If not found, Arrays.binarySearch returns -<<one based position>>of its presence.
+To copy an array (deep copy) as a new array object, you can use copyOf() method of the Arrays class.
+long arr_[]=Arrays.copyOf(arr,arr.length);
+
+We will now explore String class
+We can write both the below syntax
+String t="hello";... A
+OR
+String tt=new String("hello");... B
+What is the key difference in both the styles?
+
+... A
+String object is assigned memory from a special zone of JVM heap known as String pool.
+String t="hello";
+String s="hello";
+Two objects will NOT BE created; rather one object will be created and the memory address assigned
+will be written on both the reference variables t and s. 
+
+... B
+String object is assigned from the JVM heap (not from the String pool)
+Every call with new keyword allocates new memory thereby two different objects are created.
+
+#3
+class Sample{	
+	static public void main(String[] abc){
+	 String t="hello";
+	 String s="hello";
+
+	 System.out.println(s==t);// address comparison (true)
+	 System.out.println(s.equals(t));//content comparison (true)
+
+	 String tt=new String("hello");
+	 String ss=new String("hello");
+
+	 System.out.println(ss==tt);// address comparison (false)
+	 System.out.println(ss.equals(tt));//content comparison (true)
+
+	}	
+}
+
+The String Pool (also called String Constant Pool or String Intern Pool) is a special memory 
+region inside the Java heap where string literals are stored. 
+Its main purpose is to optimize memory usage by reusing immutable string objects instead of 
+creating duplicates.
+
+When the JVM encounters a string literal, it:
+Checks if an identical string already exists in the pool.
+Reuses the existing reference if found.
+Creates a new string in the pool if not found.
+
+What do you mean by the statement "String is immutable"?
+String t="hello";
+t.concat(" friend");//?
+
+String object is immutable means we cannot modify the existing content of a String object.
+If tried, it creates a new object with modified content leaving the previous one unaltered.
+
+#4
+class Sample{	
+	static public void main(String[] abc){
+	 String t="hello";
+	 String r=t.concat(" friend");//returns a new String object reference
+	 
+	 System.out.println(t);//hello
+	 System.out.println(r);//hello friend
+
+	}	
+}
+
+If instead of the line  String r=t.concat(" friend");
+I had written t=t.concat(" friend");//hello friend
+What will happen to the memory storing "hello" in the pool?
+
+The "hello" object if not being referenced to by any other reference variable then the object
+will become eligible for gc. So when the gc will work, the memory will get deallocated.
+
+Let us explore the prime methods of String class
+-------------------------------------------------
+concat() string
+upper(), lower() string
+indexOf(), lastIndexOf() number
+replace() string
+substr() string
+length() number
+trim() string, endsWith(), startsWith() Boolean
+contains() boolean
+split(delim) ==> array
+join(delim,arr) ==>string
+charAt(int) char
+repeat(int) ==>string
+toCharArray() ==> character array from the string
+
+	String obj="java".repeat(5);
+	System.out.println(obj);
+
+#5
+import java.util.*;
+
+class Sample{	
+	static public void main(String[] abc){
+	   String[] arr={"apple","mango","litchi"};
+
+	   String fruits=String.join("-",arr);
+	   System.out.println(fruits);
+
+	   StringJoiner sj=new StringJoiner("|","[","]");
+	   for(String s:arr)
+		sj.add(s);		
+	   System.out.println(sj.toString());
+	}	
+}
+
+Another string based utility class called StringBuilder which allows us to work
+with MUTABLE string concepts.
+
+#6
+class Sample{	
+	static public void main(String[] abc){
+	   	String[] arr={"apple","mango","litchi"};
+		StringBuilder builder=new StringBuilder();
+
+		for(String s:arr)
+			builder.append(s).append(",");
+
+		builder.insert(0,"The available fruits are: ");
+		builder.deleteCharAt(builder.length()-1);
+		System.out.println(builder.reverse().toString());
+	  
+	}	
+}
+
+When you create a StringBuilder instance by calling the default constructor, it creates
+with initial capacity 16.
+a) When the initial capacity is full, it will increase the capacity by the formula prev_cap*2+2
+class Sample{	
+	static public void main(String[] abc){
+		StringBuilder builder=new StringBuilder();
+		System.out.println(builder.capacity());//16
+
+		builder.append("java,java,java,java,java");
+		System.out.println(builder.capacity());//16*2+2=34  
+	}	
+}
+
+b) When the StringBuilder instance is created using parameterized constructor, then the 
+initial capacity becomes 16 plus length of the string passed as the argument.
+		StringBuilder builder=new StringBuilder("java");
+		System.out.println(builder.capacity());//20
+
+
+How will place the following keywords in a Java class? 
+What sequence shall we maintain
+package
+import 
+class 
+
+package package_name;
+import package_name;
+
+import java.util.Date;
+import java.util.*;
+
+There is also a concept called static import.
+This allows us to import all the static methods in one shot.
+
+#7
+import static java.lang.Math.*;
+class Sample{	
+	static public void main(String[] abc){
+		double area=PI*pow(3,2);
+		System.out.println(String.format("Area: %.2f",area));	
+		//alternate way is System.out.printf("%.2f", area);	
+	}	
+}
+
+Summary
+---------
+We explored the basic concepts of Java language
+We explored 
+a) Arrays utility class
+b) String class and its methods
+c) naming conventions
+
+Practice questions
+---------------------
+1. WAP to find the second highest number present in a numeric array.
+Assume the array to have duplicate elements.
+
+2. WAP to find if the given number is factorial of which number. 
+If not then print "no" else "yes, <<num>>" 
+Sample input
+6
+
+Sample output
+yes, 3
+
+3. WAP to create a String array (with first characters) from a String of names (separated by comma)
+Sample Input
+divya, mani, ashutosh, rajesh, rosy
+
+sample output
+[D, M, A, R, R]
+
+4. WAP to perform the validation of ip address
+a) should have 4 octets
+b) each octet should be between 0 and 255
+c) the string should not start or end with .
+Assume only numbers are entered
+Sample input
+12.56.2.9
+
+Sample output
+valid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
